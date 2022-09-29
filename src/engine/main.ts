@@ -1,8 +1,10 @@
+import { Dispatch, SetStateAction } from "react";
+
 import Engine from "./core/Engine";
-import Mesh from "./components/Mesh";
+import MeshFromOBJ from "./utils/MeshFromOBJ";
 import Object from "./core/Object";
-import Vector3 from "./core/Rendering/Vector3";
-import loadShaders from "./core/shaders";
+import Transform from "./components/Transform";
+import { UIState } from "../App";
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
 	canvas.width = window.innerWidth;
@@ -13,7 +15,7 @@ declare global {
 	var engine: Engine;
 }
 
-export default async function Init() {
+export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>>) {
 	const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
 	resizeCanvas(canvas);
 	window.onresize = () => resizeCanvas(canvas);
@@ -27,51 +29,35 @@ export default async function Init() {
 		return;
 	}
 
-	// Set clear color to black, fully opaque
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
-	// Clear the color buffer with specified clear color
-	gl.clear(gl.COLOR_BUFFER_BIT);
-
-	const programInfo = loadShaders(gl);
-
-	if (!programInfo) {
-		throw new Error("Shaders failed to init");
-	}
-
 	globalThis.engine = new Engine(gl);
-	engine.scene.shaderInfo = await programInfo;
 
 	const obj = new Object();
-	const mesh = new Mesh([
-		new Vector3(-1.0, -1.0, 0.0),
-		new Vector3(-1.0, 1.0, 0.0),
-		new Vector3(1.0, 1.0, 0.0),
-		new Vector3(-1.0, -1.0, 0.0),
-		new Vector3(1.0, 1.0, 0.0),
-		new Vector3(1.0, -1.0, 0.0),
-	]);
+	const mesh = await MeshFromOBJ("/models/monkey.obj");
 
 	obj.addComponent(mesh);
 	engine.scene.add(obj);
 
-	const obj1 = new Object();
-	const mesh1 = new Mesh([
-		new Vector3(-1.0, -1.0, 0.0),
-		new Vector3(-1.0, 1.0, 0.0),
-		new Vector3(1.0, 1.0, 0.0),
-		new Vector3(-1.0, -1.0, 0.0),
-		new Vector3(1.0, 1.0, 0.0),
-		new Vector3(1.0, -1.0, 0.0),
-	]);
+	const transform = obj.getComponent<Transform>(Transform);
+	transform?.scale.set(2, 2, 2);
 
-	obj.position.setX(3);
+	const obj1 = new Object();
+	const mesh1 = await MeshFromOBJ("/models/cube.obj");
 
 	obj1.addComponent(mesh1);
 	engine.scene.add(obj1);
 
+	const transform1 = obj1.getComponent<Transform>(Transform);
+
+	transform1?.position.setX(3);
+
+	const startTime = performance.now();
+
 	function update() {
 		engine.update();
-		obj.position.setZ(obj.position.z - 0.01);
+		const time = performance.now();
+		transform?.position.setY(Math.sin(time / 500) * 0.75);
+		transform?.rotation.setY((time - startTime) / 16);
+		if (setUiState) setUiState({ fps: engine.fps });
 		requestAnimationFrame(update);
 	}
 

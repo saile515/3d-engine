@@ -1,15 +1,13 @@
 import Component from "./Component";
-import Vector3 from "./Rendering/Vector3";
+import Transform from "../components/Transform";
 import { v4 as uuidv4 } from "uuid";
 
 export default class Object {
 	uuid: string;
-	position: Vector3;
 	components: Component[];
 
 	constructor() {
-		this.position = new Vector3(0, 0, 0);
-		this.components = [];
+		this.components = [new Transform()];
 		this.uuid = uuidv4();
 	}
 
@@ -17,7 +15,11 @@ export default class Object {
 		this.components.push(component);
 	}
 
-	getComponent<T>(type: Component) {
+	getComponent<T extends Component>(type: any) {
 		return this.components.find((component) => component instanceof (type as any)) as T | undefined;
+	}
+
+	update() {
+		this.components.forEach((component) => component.update());
 	}
 }

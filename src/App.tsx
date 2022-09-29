@@ -1,14 +1,24 @@
+import { useEffect, useState } from "react";
+
 import Init from "./engine/main";
-import { useEffect } from "react";
+
+export interface UIState {
+	fps: number;
+}
 
 function App() {
+	const [uiState, setUiState] = useState<UIState>({ fps: 0 });
+
 	useEffect(() => {
-		Init();
+		Init(setUiState);
 	}, []);
 
 	return (
 		<div className="App">
 			<canvas id="glCanvas"></canvas>
+			<div style={{ zIndex: 10, position: "fixed", top: 0, display: "flex" }}>
+				<p style={{ backgroundColor: "#ffffff99", padding: "0.5rem", display: "inline" }}>{uiState.fps}</p>
+			</div>
 		</div>
 	);
 }

@@ -1,18 +1,23 @@
 import readFile from "../utils/readFile";
 
 export interface ProgramInfo {
-	attribLocations: { vertexPosition: number };
+	attribLocations: {
+		vertexPosition: number;
+		vertexNormal: number;
+	};
+
 	program: WebGLProgram | null;
 	uniformLocations: {
-		positionMatrix: WebGLUniformLocation | null;
 		projectionMatrix: WebGLUniformLocation | null;
 		modelViewMatrix: WebGLUniformLocation | null;
+		positionMatrix: WebGLUniformLocation | null;
+		normalMatrix: WebGLUniformLocation | null;
 	};
 }
 
 export default async function loadShaders(gl: WebGL2RenderingContext): Promise<ProgramInfo | undefined> {
-	const vertexShader = readFile("/shaders/vertex/shader.vertex");
-	const fragmentShader = readFile("/shaders/fragment/shader.fragment");
+	const vertexShader = readFile("/shaders/vertex/shader.vert");
+	const fragmentShader = readFile("/shaders/fragment/shader.frag");
 
 	const shaderProgram = initShaderProgram(gl, await vertexShader, await fragmentShader);
 	if (!shaderProgram) return;
@@ -21,11 +26,13 @@ export default async function loadShaders(gl: WebGL2RenderingContext): Promise<P
 		program: shaderProgram,
 		attribLocations: {
 			vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+			vertexNormal: gl.getAttribLocation(shaderProgram, "aVertexNormal"),
 		},
 		uniformLocations: {
 			projectionMatrix: gl.getUniformLocation(shaderProgram, "uProjectionMatrix"),
 			modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
 			positionMatrix: gl.getUniformLocation(shaderProgram, "uPositionMatrix"),
+			normalMatrix: gl.getUniformLocation(shaderProgram, "uNormalMatrix"),
 		},
 	} as ProgramInfo;
 
