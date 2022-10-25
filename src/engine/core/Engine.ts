@@ -1,5 +1,4 @@
 import Scene from "./Scene";
-import loadShaders from "./shaders";
 
 export default class Engine {
 	gl: WebGL2RenderingContext;
@@ -12,21 +11,6 @@ export default class Engine {
 		this.scene = new Scene();
 		this.perfBuffer = [];
 		this.fps = 0;
-
-		this.init();
-	}
-
-	private async init() {
-		this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-		const programInfo = loadShaders(this.gl);
-
-		if (!programInfo) {
-			throw new Error("Shaders failed to init");
-		}
-
-		this.scene.shaderInfo = await programInfo;
 	}
 
 	update() {
