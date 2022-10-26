@@ -14,7 +14,7 @@ export default async function MeshFromOBJ(path: string) {
 	const normalsIndices = normalsIndicesRaw.reduce((previous, current) => [...previous, ...current]);
 	const normalsRaw = data.models[0].vertexNormals.map((vertex) => new Vector3(vertex.x, vertex.y, vertex.z));
 	const normals = normalsIndices.map((index) => normalsRaw[index]);
-	console.log(normals);
+
 	const mesh = new Mesh(vertices, indices, normals);
 	return mesh;
 }

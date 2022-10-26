@@ -1,5 +1,5 @@
-uniform mat4 uProjectionMatrix;
+attribute vec3 vertexPosition;
 
 void main() {
-    gl_Position = uProjectionMatrix;
+    gl_Position = vec4(vertexPosition, 1.0);
 }
