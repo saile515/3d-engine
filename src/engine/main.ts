@@ -1,9 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
 
 import Engine from "./core/Engine";
+import Mesh from "./components/Mesh";
 import MeshFromOBJ from "./utils/MeshFromOBJ";
 import Object from "./core/Object";
 import { UIState } from "../App";
+import { mat4 } from "gl-matrix";
 import readFile from "./utils/readFile";
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
@@ -35,113 +37,120 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 
 	const obj = new Object();
 	const mesh = await MeshFromOBJ("/models/cube.obj");
+	obj.addComponent(mesh);
 
 	const vertCode = await readFile("/shaders/vertex/shader.vert");
 	const fragCode = await readFile("/shaders/fragment/shader.frag");
 
-	console.log(process.env.PUBLIC_URL);
+	const vertex_buffer = gl.createBuffer();
+
+	// Bind appropriate array buffer to it
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+
+	// Pass the vertex data to the buffer
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.vertices.flatMap((vertex) => vertex.asArray())), gl.STATIC_DRAW);
+
+	// Unbind the buffer
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+	// Create an empty buffer object to store Index buffer
+	const index_Buffer = gl.createBuffer();
+
+	// Bind appropriate array buffer to it
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_Buffer);
+
+	// Pass the vertex data to the buffer
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(mesh.indices), gl.STATIC_DRAW);
+
+	// Unbind the buffer
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+	/*================ Shaders ====================*/
+
+	// Create a vertex shader object
+	const vertShader = gl.createShader(gl.VERTEX_SHADER)!;
+
+	// Attach vertex shader source code
+	gl.shaderSource(vertShader, vertCode);
+
+	// Compile the vertex shader
+	gl.compileShader(vertShader);
+
+	// Create fragment shader object
+	const fragShader = gl.createShader(gl.FRAGMENT_SHADER)!;
+
+	// Attach fragment shader source code
+	gl.shaderSource(fragShader, fragCode);
+
+	// Compile the fragment shader
+	gl.compileShader(fragShader);
+
+	// Create a shader program object to store
+	// the combined shader program
+	const shaderProgram = gl.createProgram()!;
+
+	// Attach a vertex shader
+	gl.attachShader(shaderProgram, vertShader);
+
+	// Attach a fragment shader
+	gl.attachShader(shaderProgram, fragShader);
+
+	// Link both the programs
+	gl.linkProgram(shaderProgram);
+
+	const programInfo = {
+		program: shaderProgram,
+		attributes: {
+			vertexPosition: gl.getAttribLocation(shaderProgram, "vertexPosition"),
+		},
+		uniforms: {
+			projectionMatrix: gl.getUniformLocation(shaderProgram, "projectionMatrix"),
+			cameraMatrix: gl.getUniformLocation(shaderProgram, "cameraMatrix"),
+			modelMatrix: gl.getUniformLocation(shaderProgram, "modelMatrix"),
+		},
+	};
+
+	// Use the combined shader program object
+	gl.useProgram(shaderProgram);
+
+	/*======= Associating shaders to buffer objects =======*/
+
+	// Bind vertex buffer object
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+
+	// Bind index buffer object
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_Buffer);
+
+	// Point an attribute to the currently bound VBO
+	gl.vertexAttribPointer(programInfo.attributes.vertexPosition, 3, gl.FLOAT, false, 0, 0);
+
+	// Enable the attribute
+	gl.enableVertexAttribArray(programInfo.attributes.vertexPosition);
 
 	const startTime = performance.now();
 
 	function update() {
 		engine.update();
+		const time = performance.now();
 
-		var vertex_buffer = gl.createBuffer();
+		const projectionMatrix = mat4.create();
+		mat4.perspective(projectionMatrix, 45 * (Math.PI / 180), gl.canvas.width / gl.canvas.height, 0.1, 1000);
 
-		// Bind appropriate array buffer to it
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+		const cameraMatrix = mat4.create();
+		mat4.translate(cameraMatrix, cameraMatrix, [5.0, 0.0, 10.0]);
+		mat4.invert(cameraMatrix, cameraMatrix);
 
-		// Pass the vertex data to the buffer
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.vertices.flatMap((vertex) => vertex.asArray())), gl.STATIC_DRAW);
+		const modelMatrix = mat4.create();
+		mat4.rotateY(modelMatrix, modelMatrix, (Math.PI / 180) * time * 0.1);
+		mat4.rotateX(modelMatrix, modelMatrix, (Math.PI / 180) * time * 0.1);
 
-		// Unbind the buffer
-		gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-		// Create an empty buffer object to store Index buffer
-		var index_Buffer = gl.createBuffer();
-
-		// Bind appropriate array buffer to it
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_Buffer);
-
-		// Pass the vertex data to the buffer
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(mesh.indices), gl.STATIC_DRAW);
-
-		// Unbind the buffer
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-
-		/*================ Shaders ====================*/
-
-		// Create a vertex shader object
-		var vertShader = gl.createShader(gl.VERTEX_SHADER)!;
-
-		// Attach vertex shader source code
-		gl.shaderSource(vertShader, vertCode);
-
-		// Compile the vertex shader
-		gl.compileShader(vertShader);
-
-		// Create fragment shader object
-		var fragShader = gl.createShader(gl.FRAGMENT_SHADER)!;
-
-		// Attach fragment shader source code
-		gl.shaderSource(fragShader, fragCode);
-
-		// Compile the fragment shader
-		gl.compileShader(fragShader);
-
-		// Create a shader program object to store
-		// the combined shader program
-		var shaderProgram = gl.createProgram()!;
-
-		// Attach a vertex shader
-		gl.attachShader(shaderProgram, vertShader);
-
-		// Attach a fragment shader
-		gl.attachShader(shaderProgram, fragShader);
-
-		// Link both the programs
-		gl.linkProgram(shaderProgram);
-
-		console.log(vertCode, fragCode);
-
-		// Use the combined shader program object
-		gl.useProgram(shaderProgram);
-
-		/*======= Associating shaders to buffer objects =======*/
-
-		// Bind vertex buffer object
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-
-		// Bind index buffer object
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_Buffer);
-
-		// Get the attribute location
-		var coord = gl.getAttribLocation(shaderProgram, "vertexPosition");
-
-		// Point an attribute to the currently bound VBO
-		gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
-
-		// Enable the attribute
-		gl.enableVertexAttribArray(coord);
-
-		/*=========Drawing the triangle===========*/
-
-		// Clear the canvas
-		gl.clearColor(0.5, 0.5, 0.5, 0.9);
-
-		// Enable the depth test
-		gl.enable(gl.DEPTH_TEST);
-
-		// Clear the color buffer bit
-		gl.clear(gl.COLOR_BUFFER_BIT);
-
-		// Set the view port
-		gl.viewport(0, 0, canvas.width, canvas.height);
+		gl.uniformMatrix4fv(programInfo.uniforms.projectionMatrix, false, projectionMatrix);
+		gl.uniformMatrix4fv(programInfo.uniforms.cameraMatrix, false, cameraMatrix);
+		gl.uniformMatrix4fv(programInfo.uniforms.modelMatrix, false, modelMatrix);
 
 		// Draw the triangle
 		gl.drawElements(gl.TRIANGLES, mesh.indices.length, gl.UNSIGNED_SHORT, 0);
 
-		const time = performance.now();
 		if (setUiState) setUiState({ fps: engine.fps });
 		requestAnimationFrame(update);
 	}
