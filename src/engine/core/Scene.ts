@@ -1,7 +1,6 @@
 import Camera from "./Camera";
 import Mesh from "../components/Mesh";
 import Object from "./Object";
-import { mat4 } from "gl-matrix";
 import readFile from "../utils/readFile";
 
 export interface ProgramInfo {

@@ -1,9 +1,6 @@
-import * as VecMath from "../utils/VecMath";
-
 import Camera from "../core/Camera";
 import Component from "../core/Component";
 import { ProgramInfo } from "../core/Scene";
-import Vector3 from "../core/Vector3";
 import { mat4 } from "gl-matrix";
 
 export default class Mesh extends Component {
