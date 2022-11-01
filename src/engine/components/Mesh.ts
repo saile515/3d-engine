@@ -1,4 +1,4 @@
-import Camera from "../core/Camera";
+import Camera from "../objects/Camera";
 import Component from "../core/Component";
 import { ProgramInfo } from "../core/Scene";
 import Transform from "./Transform";
@@ -29,7 +29,7 @@ export default class Mesh extends Component {
 	render(programInfo: ProgramInfo, camera: Camera) {
 		// Update model matrix
 		const transform = this.parent.getComponent<Transform>(Transform);
-		mat4.fromRotationTranslationScale(this.modelMatrix, transform.quaternion, transform.position.asArray(), transform.scale.asArray());
+		this.modelMatrix = transform.matrix;
 
 		// Update normal matrix
 		mat4.multiply(this.normalMatrix, this.modelMatrix, globalThis.engine.scene.camera.viewMatrix);

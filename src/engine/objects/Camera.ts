@@ -1,6 +1,8 @@
+import Object from "../core/Object";
+import Transform from "../components/Transform";
 import { mat4 } from "gl-matrix";
 
-export default class Camera {
+export default class Camera extends Object {
 	fieldOfView: number;
 	aspect: number;
 	zNear: number;
@@ -9,6 +11,7 @@ export default class Camera {
 	viewMatrix: mat4;
 
 	constructor() {
+		super();
 		this.fieldOfView = (90 * Math.PI) / 180;
 		this.aspect = window.innerWidth / window.innerHeight;
 		this.zNear = 0.1;
@@ -23,8 +26,11 @@ export default class Camera {
 		const gl = globalThis.gl;
 
 		mat4.perspective(this.projectionMatrix, 45 * (Math.PI / 180), gl.canvas.width / gl.canvas.height, this.zNear, this.zFar);
+	}
 
-		mat4.translate(this.viewMatrix, this.viewMatrix, [0.0, 0.0, 10.0]);
-		mat4.invert(this.viewMatrix, this.viewMatrix);
+	update() {
+		super.update();
+		const transform = this.getComponent<Transform>(Transform);
+		mat4.invert(this.viewMatrix, transform.matrix);
 	}
 }

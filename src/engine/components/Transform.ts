@@ -1,4 +1,4 @@
-import { mat4, quat, vec3 } from "gl-matrix";
+import { mat4, quat } from "gl-matrix";
 
 import Component from "../core/Component";
 import Vector3 from "../core/Vector3";
@@ -20,11 +20,7 @@ export default class Transform extends Component {
 	}
 
 	update() {
-		mat4.fromRotationTranslationScale(
-			this.matrix,
-			quat.fromEuler(this.quaternion, this.rotation.x, this.rotation.y, this.rotation.z),
-			vec3.fromValues(this.position.x, this.position.y, this.position.z),
-			vec3.fromValues(this.scale.x, this.scale.y, this.scale.z)
-		);
+		quat.fromEuler(this.quaternion, this.rotation.x, this.rotation.y, this.rotation.z);
+		mat4.fromRotationTranslationScale(this.matrix, this.quaternion, this.position.asArray(), this.scale.asArray());
 	}
 }

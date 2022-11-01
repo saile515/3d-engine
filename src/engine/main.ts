@@ -42,7 +42,7 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 	const mesh = await MeshFromOBJ("/models/monkey.obj");
 	obj.addComponent(mesh);
 	scene.add(obj);
-	const transform = obj.getComponent<Transform>(Transform);
+	const transform = scene.camera.getComponent<Transform>(Transform);
 
 	const startTime = performance.now();
 
@@ -50,10 +50,8 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 		engine.update();
 		const time = performance.now();
 
-		transform.rotation.setY(time * 0.125);
-
-		const scale = Math.sin(time * 0.001) + 2;
-		transform.scale.set(scale, scale, scale);
+		transform.position.setZ(10);
+		transform.rotation.setY(time * 0.01);
 
 		if (setUiState) setUiState({ fps: engine.fps });
 		requestAnimationFrame(update);

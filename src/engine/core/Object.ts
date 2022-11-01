@@ -7,8 +7,10 @@ export default class Object {
 	components: Component[];
 
 	constructor() {
-		this.components = [new Transform()];
+		this.components = [];
 		this.uuid = uuidv4();
+
+		this.addComponent(new Transform());
 	}
 
 	addComponent(component: Component) {

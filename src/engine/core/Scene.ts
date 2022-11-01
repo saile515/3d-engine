@@ -1,4 +1,4 @@
-import Camera from "./Camera";
+import Camera from "../objects/Camera";
 import Mesh from "../components/Mesh";
 import Object from "./Object";
 import readFile from "../utils/readFile";
@@ -25,6 +25,7 @@ export default class Scene {
 	constructor() {
 		this.children = [];
 		this.camera = new Camera();
+		this.add(this.camera);
 		this.init();
 	}
 
