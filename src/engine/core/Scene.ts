@@ -74,7 +74,7 @@ export default class Scene {
 
 	render() {
 		if (!this.programInfo) return;
-		const gl = globalThis.engine.gl;
+		const gl = globalThis.gl;
 
 		// Clear the canvas
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);

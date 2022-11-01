@@ -34,7 +34,7 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 
 	globalThis.gl = gl;
 
-	globalThis.engine = new Engine(gl);
+	globalThis.engine = new Engine();
 
 	const scene = globalThis.engine.scene;
 

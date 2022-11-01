@@ -1,13 +1,11 @@
 import Scene from "./Scene";
 
 export default class Engine {
-	gl: WebGL2RenderingContext;
 	scene: Scene;
 	private perfBuffer: number[];
 	fps: number;
 
-	constructor(gl: WebGL2RenderingContext) {
-		this.gl = gl;
+	constructor() {
 		this.scene = new Scene();
 		this.perfBuffer = [];
 		this.fps = 0;
