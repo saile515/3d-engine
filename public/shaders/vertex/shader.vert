@@ -12,8 +12,8 @@ void main() {
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 
     highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
-    highp vec3 directionalLightColor = vec3(1, 1, 1);
-    highp vec3 directionalVector = normalize(vec3(0.0, 0.0, 1.0));
+    highp vec3 directionalLightColor = vec3(0.7, 0.65, 0.6);
+    highp vec3 directionalVector = normalize(vec3(1.0, -1.0, 1.0));
 
     highp vec4 transformedNormal = normalMatrix * vec4(vertexNormal, 1.0);
 

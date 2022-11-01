@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import Engine from "./core/Engine";
 import MeshFromOBJ from "./utils/MeshFromOBJ";
 import Object from "./core/Object";
+import Transform from "./components/Transform";
 import { UIState } from "../App";
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
@@ -35,16 +36,24 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 
 	globalThis.engine = new Engine(gl);
 
+	const scene = globalThis.engine.scene;
+
 	const obj = new Object();
 	const mesh = await MeshFromOBJ("/models/monkey.obj");
 	obj.addComponent(mesh);
-	globalThis.engine.scene.add(obj);
+	scene.add(obj);
+	const transform = obj.getComponent<Transform>(Transform);
 
 	const startTime = performance.now();
 
 	function update() {
 		engine.update();
 		const time = performance.now();
+
+		transform.rotation.setY(time * 0.125);
+
+		const scale = Math.sin(time * 0.001) + 2;
+		transform.scale.set(scale, scale, scale);
 
 		if (setUiState) setUiState({ fps: engine.fps });
 		requestAnimationFrame(update);

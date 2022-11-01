@@ -24,7 +24,7 @@ export default class Camera {
 
 		mat4.perspective(this.projectionMatrix, 45 * (Math.PI / 180), gl.canvas.width / gl.canvas.height, this.zNear, this.zFar);
 
-		mat4.translate(this.viewMatrix, this.viewMatrix, [5.0, 0.0, -10.0]);
-		//mat4.invert(this.viewMatrix, this.viewMatrix);
+		mat4.translate(this.viewMatrix, this.viewMatrix, [0.0, 0.0, 10.0]);
+		mat4.invert(this.viewMatrix, this.viewMatrix);
 	}
 }

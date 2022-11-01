@@ -8,7 +8,7 @@ export default class Transform extends Component {
 	rotation: Vector3;
 	scale: Vector3;
 	matrix: mat4;
-	private quaternion: quat;
+	quaternion: quat;
 
 	constructor(position?: Vector3, rotation?: Vector3, scale?: Vector3) {
 		super();

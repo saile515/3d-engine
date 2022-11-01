@@ -1,21 +1,41 @@
 import Camera from "../core/Camera";
 import Component from "../core/Component";
 import { ProgramInfo } from "../core/Scene";
+import Transform from "./Transform";
 import { mat4 } from "gl-matrix";
 
 export default class Mesh extends Component {
 	vertices: number[];
 	indices: number[];
 	normals: number[];
+	private modelMatrix: mat4;
+	private normalMatrix: mat4;
 
 	constructor(vertices: number[], indices: number[], normals: number[]) {
 		super();
 		this.vertices = vertices;
 		this.indices = indices;
 		this.normals = normals;
+
+		this.initMatrices();
+	}
+
+	initMatrices() {
+		this.modelMatrix = mat4.create();
+
+		this.normalMatrix = mat4.create();
 	}
 
 	render(programInfo: ProgramInfo, camera: Camera) {
+		// Update model matrix
+		const transform = this.parent.getComponent<Transform>(Transform);
+		mat4.fromRotationTranslationScale(this.modelMatrix, transform.quaternion, transform.position.asArray(), transform.scale.asArray());
+
+		// Update normal matrix
+		mat4.multiply(this.normalMatrix, this.modelMatrix, globalThis.engine.scene.camera.viewMatrix);
+		mat4.invert(this.normalMatrix, this.normalMatrix);
+		mat4.transpose(this.normalMatrix, this.normalMatrix);
+
 		const gl = globalThis.gl;
 
 		// Create vertex buffer
@@ -38,20 +58,10 @@ export default class Mesh extends Component {
 		gl.vertexAttribPointer(programInfo.attributes.vertexNormal, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(programInfo.attributes.vertexNormal);
 
-		// Create matrices
-		const modelMatrix = mat4.create();
-		mat4.rotateY(modelMatrix, modelMatrix, (Math.PI / 180) * performance.now() * 0.1);
-		//mat4.rotateX(modelMatrix, modelMatrix, (Math.PI / 180) * performance.now() * 0.1);
-
-		const normalMatrix = mat4.create();
-		mat4.multiply(normalMatrix, modelMatrix, camera.viewMatrix);
-		mat4.invert(normalMatrix, normalMatrix);
-		mat4.transpose(normalMatrix, normalMatrix);
-
 		gl.uniformMatrix4fv(programInfo.uniforms.projectionMatrix, false, camera.projectionMatrix);
 		gl.uniformMatrix4fv(programInfo.uniforms.viewMatrix, false, camera.viewMatrix);
-		gl.uniformMatrix4fv(programInfo.uniforms.modelMatrix, false, modelMatrix);
-		gl.uniformMatrix4fv(programInfo.uniforms.normalMatrix, false, normalMatrix);
+		gl.uniformMatrix4fv(programInfo.uniforms.modelMatrix, false, this.modelMatrix);
+		gl.uniformMatrix4fv(programInfo.uniforms.normalMatrix, false, this.normalMatrix);
 
 		// Draw the mesh
 		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);

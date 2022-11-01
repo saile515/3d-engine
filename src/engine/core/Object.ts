@@ -12,6 +12,7 @@ export default class Object {
 	}
 
 	addComponent(component: Component) {
+		component.parent = this;
 		this.components.push(component);
 	}
 
