@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import Init from "./engine/main";
+import Init from "./game/main";
 
 export interface UIState {
 	fps: number;

@@ -19,6 +19,12 @@ export default class Vector3 {
 		this.z = z;
 	}
 
+	setAll(xyz: number) {
+		this.x = xyz;
+		this.y = xyz;
+		this.z = xyz;
+	}
+
 	setX(x: number) {
 		this.x = x;
 	}

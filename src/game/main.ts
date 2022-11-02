@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
 
-import Engine from "./core/Engine";
-import MeshFromOBJ from "./utils/MeshFromOBJ";
-import Object from "./core/Object";
-import Transform from "./components/Transform";
+import Engine from "../engine/core/Engine";
+import { Key } from "../engine/input/KeyEnum";
+import MeshFromOBJ from "../engine/utils/MeshFromOBJ";
+import Object from "../engine/core/Object";
+import Transform from "../engine/components/Transform";
 import { UIState } from "../App";
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
@@ -38,21 +39,27 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 
 	const scene = globalThis.engine.scene;
 
+	canvas.onclick = () => engine.inputHandler.lockMouse();
+
 	const obj = new Object();
 	const mesh = await MeshFromOBJ("/models/sphere.obj");
 	obj.addComponent(mesh);
 	scene.add(obj);
 	const transform = obj.getComponent<Transform>(Transform);
 
-	const startTime = performance.now();
+	transform.position.setZ(-10);
 
 	function update() {
 		engine.update();
-		const time = performance.now();
 
-		transform.position.setZ(-10);
-		transform.rotation.setY(time * 0.01);
+		if (engine.inputHandler.getKey(Key.W)) transform.position.setZ(transform.position.z - 1 * engine.deltaTime);
+		if (engine.inputHandler.getKey(Key.S)) transform.position.setZ(transform.position.z + 1 * engine.deltaTime);
+		if (engine.inputHandler.getKey(Key.A)) transform.position.setX(transform.position.x - 1 * engine.deltaTime);
+		if (engine.inputHandler.getKey(Key.D)) transform.position.setX(transform.position.x + 1 * engine.deltaTime);
 
+		transform.scale.setAll(transform.scale.x + engine.inputHandler.mouseDelta.y / 1000);
+
+		engine.clean();
 		if (setUiState) setUiState({ fps: engine.fps });
 		requestAnimationFrame(update);
 	}
