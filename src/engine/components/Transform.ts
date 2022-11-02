@@ -20,7 +20,9 @@ export default class Transform extends Component {
 	}
 
 	update() {
+		// Create quaternion from euler angles
 		quat.fromEuler(this.quaternion, this.rotation.x, this.rotation.y, this.rotation.z);
+		// Update matrix from values
 		mat4.fromRotationTranslationScale(this.matrix, this.quaternion, this.position.asArray(), this.scale.asArray());
 	}
 }

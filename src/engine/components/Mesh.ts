@@ -22,7 +22,6 @@ export default class Mesh extends Component {
 
 	initMatrices() {
 		this.modelMatrix = mat4.create();
-
 		this.normalMatrix = mat4.create();
 	}
 

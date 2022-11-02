@@ -32,6 +32,7 @@ export default class Scene {
 	async init() {
 		const gl = globalThis.gl;
 
+		// Get shader code from public folder
 		const vertCode = await readFile("/shaders/vertex/shader.vert");
 		const fragCode = await readFile("/shaders/fragment/shader.frag");
 
@@ -51,6 +52,7 @@ export default class Scene {
 		gl.attachShader(shaderProgram, fragShader);
 		gl.linkProgram(shaderProgram);
 
+		// Get memory locations for GPU communication
 		this.programInfo = {
 			program: shaderProgram,
 			attributes: {
@@ -76,21 +78,16 @@ export default class Scene {
 		if (!this.programInfo) return;
 		const gl = globalThis.gl;
 
-		// Clear the canvas
+		// Prepare canvas for render
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
-
-		// Enable the depth test
 		gl.enable(gl.DEPTH_TEST);
-
-		// Clear the color buffer bit
 		gl.clear(gl.COLOR_BUFFER_BIT);
-
-		// Set the view port
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-		// Use the combined shader program object
+		// Use the shader program
 		gl.useProgram(this.programInfo!.program);
 
+		// Render each mesh
 		this.children.forEach((object) => {
 			const mesh = object.getComponent<Mesh>(Mesh);
 			if (!mesh) return;

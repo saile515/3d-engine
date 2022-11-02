@@ -30,6 +30,7 @@ export default class Camera extends Object {
 
 	update() {
 		super.update();
+		// Invert view matrix
 		const transform = this.getComponent<Transform>(Transform);
 		mat4.invert(this.viewMatrix, transform.matrix);
 	}

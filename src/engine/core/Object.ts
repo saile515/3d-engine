@@ -10,6 +10,7 @@ export default class Object {
 		this.components = [];
 		this.uuid = uuidv4();
 
+		// Init all objects with a transform
 		this.addComponent(new Transform());
 	}
 
