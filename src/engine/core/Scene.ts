@@ -8,12 +8,14 @@ export interface ProgramInfo {
 	attributes: {
 		vertexPosition: number;
 		vertexNormal: number;
+		texturePosition: number;
 	};
 	uniforms: {
 		projectionMatrix: WebGLUniformLocation | null;
 		viewMatrix: WebGLUniformLocation | null;
 		modelMatrix: WebGLUniformLocation | null;
 		normalMatrix: WebGLUniformLocation | null;
+		uSampler: WebGLUniformLocation | null;
 	};
 }
 
@@ -58,12 +60,14 @@ export default class Scene {
 			attributes: {
 				vertexPosition: gl.getAttribLocation(shaderProgram, "vertexPosition"),
 				vertexNormal: gl.getAttribLocation(shaderProgram, "vertexNormal"),
+				texturePosition: gl.getAttribLocation(shaderProgram, "texturePosition"),
 			},
 			uniforms: {
 				projectionMatrix: gl.getUniformLocation(shaderProgram, "projectionMatrix"),
 				viewMatrix: gl.getUniformLocation(shaderProgram, "viewMatrix"),
 				modelMatrix: gl.getUniformLocation(shaderProgram, "modelMatrix"),
 				normalMatrix: gl.getUniformLocation(shaderProgram, "normalMatrix"),
+				uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
 			},
 		};
 	}

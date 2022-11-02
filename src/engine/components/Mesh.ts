@@ -1,6 +1,7 @@
 import Camera from "../objects/Camera";
 import Component from "../core/Component";
 import { ProgramInfo } from "../core/Scene";
+import Texture from "./Texture";
 import Transform from "./Transform";
 import { mat4 } from "gl-matrix";
 
@@ -8,14 +9,16 @@ export default class Mesh extends Component {
 	vertices: number[];
 	indices: number[];
 	normals: number[];
+	textures: number[];
 	private modelMatrix: mat4;
 	private normalMatrix: mat4;
 
-	constructor(vertices: number[], indices: number[], normals: number[]) {
+	constructor(vertices: number[], indices: number[], normals: number[], textures: number[]) {
 		super();
 		this.vertices = vertices;
 		this.indices = indices;
 		this.normals = normals;
+		this.textures = textures;
 
 		this.initMatrices();
 	}
@@ -56,6 +59,21 @@ export default class Mesh extends Component {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals), gl.STATIC_DRAW);
 		gl.vertexAttribPointer(programInfo.attributes.vertexNormal, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(programInfo.attributes.vertexNormal);
+
+		// Create texture buffer
+		const textureBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.textures), gl.STATIC_DRAW);
+		gl.vertexAttribPointer(programInfo.attributes.texturePosition, 2, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(programInfo.attributes.texturePosition);
+
+		// Bind texture
+		const texture = this.parent.getComponent<Texture>(Texture);
+		if (texture) {
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, texture.texture);
+			gl.uniform1i(programInfo.uniforms.uSampler, 0);
+		}
 
 		gl.uniformMatrix4fv(programInfo.uniforms.projectionMatrix, false, camera.projectionMatrix);
 		gl.uniformMatrix4fv(programInfo.uniforms.viewMatrix, false, camera.viewMatrix);

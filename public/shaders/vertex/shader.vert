@@ -1,5 +1,6 @@
 attribute vec3 vertexPosition;
 attribute vec3 vertexNormal;
+attribute vec2 texturePosition;
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -7,6 +8,7 @@ uniform mat4 modelMatrix;
 uniform mat4 normalMatrix;
 
 varying highp vec3 vLighting;
+varying highp vec2 vTexturePosition;
 
 void main() {
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
@@ -19,4 +21,5 @@ void main() {
 
     highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
     vLighting = ambientLight + (directionalLightColor * directional);
+    vTexturePosition = texturePosition;
 }

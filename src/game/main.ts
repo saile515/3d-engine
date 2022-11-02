@@ -4,6 +4,7 @@ import Engine from "../engine/core/Engine";
 import { Key } from "../engine/input/KeyEnum";
 import MeshFromOBJ from "../engine/utils/MeshFromOBJ";
 import Object from "../engine/core/Object";
+import TextureFromImg from "../engine/utils/TextureFromImg";
 import Transform from "../engine/components/Transform";
 import { UIState } from "../App";
 
@@ -44,6 +45,8 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 	const obj = new Object();
 	const mesh = await MeshFromOBJ("/models/sphere.obj");
 	obj.addComponent(mesh);
+	const texture = await TextureFromImg("/images/cat.png");
+	obj.addComponent(texture);
 	scene.add(obj);
 	const transform = obj.getComponent<Transform>(Transform);
 
