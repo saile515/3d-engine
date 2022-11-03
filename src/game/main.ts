@@ -4,9 +4,11 @@ import Engine from "../engine/core/Engine";
 import { Key } from "../engine/input/KeyEnum";
 import MeshFromOBJ from "../engine/utils/MeshFromOBJ";
 import Object from "../engine/core/Object";
+import Shader from "../engine/components/Shader";
 import TextureFromImg from "../engine/utils/TextureFromImg";
 import Transform from "../engine/components/Transform";
 import { UIState } from "../App";
+import readFile from "../engine/utils/readFile";
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
 	canvas.width = window.innerWidth;
@@ -38,7 +40,7 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 
 	globalThis.engine = new Engine();
 
-	const scene = globalThis.engine.scene;
+	const scene = engine.scene;
 
 	canvas.onclick = () => engine.inputHandler.lockMouse();
 
@@ -47,6 +49,10 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 	obj.addComponent(mesh);
 	const texture = await TextureFromImg("/images/cat.png");
 	obj.addComponent(texture);
+	const vertCode = await readFile("/shaders/vertex/shader.vert");
+	const fragCode = await readFile("/shaders/fragment/shader.frag");
+	const shader = new Shader(vertCode, fragCode);
+	obj.addComponent(shader);
 	scene.add(obj);
 	const transform = obj.getComponent<Transform>(Transform);
 
@@ -54,13 +60,33 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 
 	function update() {
 		engine.update();
+		const camera = engine.scene.camera;
+		const cameraTransform = camera.getComponent<Transform>(Transform);
 
-		if (engine.inputHandler.getKey(Key.W)) transform.position.setZ(transform.position.z - 1 * engine.deltaTime);
-		if (engine.inputHandler.getKey(Key.S)) transform.position.setZ(transform.position.z + 1 * engine.deltaTime);
-		if (engine.inputHandler.getKey(Key.A)) transform.position.setX(transform.position.x - 1 * engine.deltaTime);
-		if (engine.inputHandler.getKey(Key.D)) transform.position.setX(transform.position.x + 1 * engine.deltaTime);
+		const angle = cameraTransform.rotation.y * (Math.PI / 180);
 
-		transform.scale.setAll(transform.scale.x + engine.inputHandler.mouseDelta.y / 1000);
+		if (engine.inputHandler.getKey(Key.W)) {
+			cameraTransform.position.setZ(cameraTransform.position.z - Math.cos(angle) * 2 * engine.deltaTime);
+			cameraTransform.position.setX(cameraTransform.position.x - Math.sin(angle) * 2 * engine.deltaTime);
+		}
+
+		if (engine.inputHandler.getKey(Key.S)) {
+			cameraTransform.position.setZ(cameraTransform.position.z + Math.cos(angle) * 2 * engine.deltaTime);
+			cameraTransform.position.setX(cameraTransform.position.x + Math.sin(angle) * 2 * engine.deltaTime);
+		}
+
+		if (engine.inputHandler.getKey(Key.A)) {
+			cameraTransform.position.setZ(cameraTransform.position.z - Math.cos(angle + Math.PI / 2) * 2 * engine.deltaTime);
+			cameraTransform.position.setX(cameraTransform.position.x - Math.sin(angle + Math.PI / 2) * 2 * engine.deltaTime);
+		}
+
+		if (engine.inputHandler.getKey(Key.D)) {
+			cameraTransform.position.setZ(cameraTransform.position.z + Math.cos(angle + Math.PI / 2) * 2 * engine.deltaTime);
+			cameraTransform.position.setX(cameraTransform.position.x + Math.sin(angle + Math.PI / 2) * 2 * engine.deltaTime);
+		}
+
+		cameraTransform.rotation.setY(cameraTransform.rotation.y - engine.inputHandler.mouseDelta.x / 10);
+		cameraTransform.rotation.setX(cameraTransform.rotation.x - engine.inputHandler.mouseDelta.y / 10);
 
 		engine.clean();
 		if (setUiState) setUiState({ fps: engine.fps });

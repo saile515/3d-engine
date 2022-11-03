@@ -51,6 +51,6 @@ export default class InputHandler {
 
 	lockMouse() {
 		// Lock mouse
-		globalThis.gl.canvas.requestPointerLock();
+		gl.canvas.requestPointerLock();
 	}
 }

@@ -15,7 +15,7 @@ export default class Camera extends Object {
 		this.fieldOfView = (90 * Math.PI) / 180;
 		this.aspect = window.innerWidth / window.innerHeight;
 		this.zNear = 0.1;
-		this.zFar = 100.0;
+		this.zFar = 1000.0;
 		this.projectionMatrix = mat4.create();
 		this.viewMatrix = mat4.create();
 
@@ -23,8 +23,6 @@ export default class Camera extends Object {
 	}
 
 	init() {
-		const gl = globalThis.gl;
-
 		mat4.perspective(this.projectionMatrix, 45 * (Math.PI / 180), gl.canvas.width / gl.canvas.height, this.zNear, this.zFar);
 	}
 

@@ -34,11 +34,9 @@ export default class Mesh extends Component {
 		this.modelMatrix = transform.matrix;
 
 		// Update normal matrix
-		mat4.multiply(this.normalMatrix, this.modelMatrix, globalThis.engine.scene.camera.viewMatrix);
+		mat4.multiply(this.normalMatrix, this.modelMatrix, engine.scene.camera.viewMatrix);
 		mat4.invert(this.normalMatrix, this.normalMatrix);
 		mat4.transpose(this.normalMatrix, this.normalMatrix);
-
-		const gl = globalThis.gl;
 
 		// Create vertex buffer
 		const vertexBuffer = gl.createBuffer();
@@ -72,7 +70,7 @@ export default class Mesh extends Component {
 		if (texture) {
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, texture.texture);
-			gl.uniform1i(programInfo.uniforms.uSampler, 0);
+			gl.uniform1i(programInfo.uniforms.sampler, 0);
 		}
 
 		gl.uniformMatrix4fv(programInfo.uniforms.projectionMatrix, false, camera.projectionMatrix);
