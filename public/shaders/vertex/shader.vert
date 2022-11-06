@@ -1,5 +1,6 @@
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;
+attribute vec3 aVertexColor;
 attribute vec2 aTexturePosition;
 
 uniform mat4 uProjectionMatrix;
@@ -8,6 +9,7 @@ uniform mat4 uModelMatrix;
 uniform mat4 uNormalMatrix;
 
 varying highp vec3 vLighting;
+varying highp vec3 vVertexColor;
 varying highp vec2 vTexturePosition;
 
 void main() {
@@ -21,5 +23,6 @@ void main() {
 
     highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
     vLighting = ambientLight + (directionalLightColor * directional);
+    vVertexColor = aVertexColor;
     vTexturePosition = aTexturePosition;
 }

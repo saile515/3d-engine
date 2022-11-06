@@ -1,6 +1,7 @@
 import Camera from "../objects/Camera";
 import Component from "../core/Component";
-import { ProgramInfo } from "../core/Scene";
+import Material from "./Material";
+import { ProgramInfo } from "./Shader";
 import Texture from "./Texture";
 import Transform from "./Transform";
 import { mat4 } from "gl-matrix";
@@ -58,19 +59,37 @@ export default class Mesh extends Component {
 		gl.vertexAttribPointer(programInfo.attributes.vertexNormal, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(programInfo.attributes.vertexNormal);
 
-		// Create texture buffer
-		const textureBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.textures), gl.STATIC_DRAW);
-		gl.vertexAttribPointer(programInfo.attributes.texturePosition, 2, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(programInfo.attributes.texturePosition);
-
-		// Bind texture
 		const texture = this.parent.getComponent<Texture>(Texture);
+
 		if (texture) {
+			// Create texture buffer
+			const textureBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.textures), gl.STATIC_DRAW);
+			gl.vertexAttribPointer(programInfo.attributes.texturePosition, 2, gl.FLOAT, false, 0, 0);
+			gl.enableVertexAttribArray(programInfo.attributes.texturePosition);
+
+			// Bind texture
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, texture.texture);
 			gl.uniform1i(programInfo.uniforms.sampler, 0);
+		}
+
+		const material = this.parent.getComponent<Material>(Material);
+
+		if (!texture && material) {
+			// Generate color array
+			const colorArray = [];
+			for (let i = 0; i < this.indices.length; i++) {
+				colorArray.push(material.color.asArray());
+			}
+
+			// Create material buffer
+			const materialBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, materialBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorArray.flat()), gl.STATIC_DRAW);
+			gl.vertexAttribPointer(programInfo.attributes.vertexColor, 3, gl.FLOAT, false, 0, 0);
+			gl.enableVertexAttribArray(programInfo.attributes.vertexColor);
 		}
 
 		gl.uniformMatrix4fv(programInfo.uniforms.projectionMatrix, false, camera.projectionMatrix);

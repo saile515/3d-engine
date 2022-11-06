@@ -2,12 +2,14 @@ import { Dispatch, SetStateAction } from "react";
 
 import Engine from "../engine/core/Engine";
 import { Key } from "../engine/input/KeyEnum";
+import Material from "../engine/components/Material";
 import MeshFromOBJ from "../engine/utils/MeshFromOBJ";
 import Object from "../engine/core/Object";
 import Shader from "../engine/components/Shader";
 import TextureFromImg from "../engine/utils/TextureFromImg";
 import Transform from "../engine/components/Transform";
 import { UIState } from "../App";
+import Vector3 from "../engine/core/Vector3";
 import readFile from "../engine/utils/readFile";
 
 function resizeCanvas(canvas: HTMLCanvasElement) {
@@ -47,12 +49,18 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 	const obj = new Object();
 	const mesh = await MeshFromOBJ("/models/sphere.obj");
 	obj.addComponent(mesh);
-	const texture = await TextureFromImg("/images/cat.png");
-	obj.addComponent(texture);
+	// const texture = await TextureFromImg("/images/cat.png");
+	// obj.addComponent(texture);
+	// const vertCode = await readFile("/shaders/vertex/shader.vert");
+	// const fragCode = await readFile("/shaders/fragment/shader.frag");
+
+	const material = new Material(new Vector3(1.0, 0.0, 0.0));
+	obj.addComponent(material);
 	const vertCode = await readFile("/shaders/vertex/shader.vert");
-	const fragCode = await readFile("/shaders/fragment/shader.frag");
+	const fragCode = await readFile("/shaders/fragment/material.frag");
 	const shader = new Shader(vertCode, fragCode);
 	obj.addComponent(shader);
+
 	scene.add(obj);
 	const transform = obj.getComponent<Transform>(Transform);
 

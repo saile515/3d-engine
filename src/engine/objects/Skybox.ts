@@ -13,7 +13,7 @@ export default class Skybox extends Object {
 	async init() {
 		const mesh = await MeshFromOBJ("/models/skybox.obj");
 		this.addComponent(mesh);
-		const texture = await TextureFromImg("/images/skybox.png");
+		const texture = await TextureFromImg("/images/skybox1.png");
 		this.addComponent(texture);
 		this.getComponent<Transform>(Transform).scale.setAll(500);
 		this.getComponent<Transform>(Transform).position = engine.scene.camera.getComponent<Transform>(Transform).position;

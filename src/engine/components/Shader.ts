@@ -1,5 +1,21 @@
 import Component from "../core/Component";
-import { ProgramInfo } from "../core/Scene";
+
+export interface ProgramInfo {
+	program: WebGLProgram | null;
+	attributes: {
+		vertexPosition: number;
+		vertexNormal: number;
+		vertexColor?: number;
+		texturePosition?: number;
+	};
+	uniforms: {
+		projectionMatrix: WebGLUniformLocation | null;
+		viewMatrix: WebGLUniformLocation | null;
+		modelMatrix: WebGLUniformLocation | null;
+		normalMatrix: WebGLUniformLocation | null;
+		sampler?: WebGLUniformLocation | null;
+	};
+}
 
 export default class Shader extends Component {
 	vertexShader: string;
@@ -37,6 +53,7 @@ export default class Shader extends Component {
 			attributes: {
 				vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
 				vertexNormal: gl.getAttribLocation(shaderProgram, "aVertexNormal"),
+				vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor"),
 				texturePosition: gl.getAttribLocation(shaderProgram, "aTexturePosition"),
 			},
 			uniforms: {

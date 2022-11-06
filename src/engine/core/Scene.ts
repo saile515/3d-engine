@@ -5,26 +5,9 @@ import Shader from "../components/Shader";
 import Skybox from "../objects/Skybox";
 import readFile from "../utils/readFile";
 
-export interface ProgramInfo {
-	program: WebGLProgram | null;
-	attributes: {
-		vertexPosition: number;
-		vertexNormal: number;
-		texturePosition: number;
-	};
-	uniforms: {
-		projectionMatrix: WebGLUniformLocation | null;
-		viewMatrix: WebGLUniformLocation | null;
-		modelMatrix: WebGLUniformLocation | null;
-		normalMatrix: WebGLUniformLocation | null;
-		sampler: WebGLUniformLocation | null;
-	};
-}
-
 export default class Scene {
 	children: Object[];
 	camera: Camera;
-	programInfo: ProgramInfo | undefined;
 
 	constructor() {
 		this.children = [];
