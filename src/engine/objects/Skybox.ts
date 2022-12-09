@@ -10,7 +10,7 @@ export default class Skybox extends Object {
 		this.init();
 	}
 
-	async init() {
+	private async init() {
 		const mesh = await MeshFromOBJ("/models/skybox.obj");
 		this.addComponent(mesh);
 		const texture = await TextureFromImg("/images/skybox1.png");

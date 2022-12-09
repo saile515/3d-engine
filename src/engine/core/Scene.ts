@@ -16,7 +16,7 @@ export default class Scene {
 		this.init();
 	}
 
-	async init() {
+	private async init() {
 		// Flip textures
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
@@ -35,7 +35,7 @@ export default class Scene {
 		this.render();
 	}
 
-	render() {
+	private render() {
 		// Prepare canvas for render
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);

@@ -44,6 +44,7 @@
 		]
 	},
 	"devDependencies": {
+		"@types/gl-matrix": "^3.2.0",
 		"@types/obj-file-parser": "^0.5.0",
 		"@types/uuid": "^8.3.4"
 	}

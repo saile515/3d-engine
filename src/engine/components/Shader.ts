@@ -18,8 +18,8 @@ export interface ProgramInfo {
 }
 
 export default class Shader extends Component {
-	vertexShader: string;
-	fragmentShader: string;
+	private vertexShader: string;
+	private fragmentShader: string;
 	programInfo: ProgramInfo;
 	program: WebGLProgram;
 
@@ -46,6 +46,7 @@ export default class Shader extends Component {
 		gl.attachShader(shaderProgram, vertShader);
 		gl.attachShader(shaderProgram, fragShader);
 		gl.linkProgram(shaderProgram);
+		this.program = shaderProgram;
 
 		// Get memory locations for GPU communications
 		this.programInfo = {

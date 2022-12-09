@@ -1,7 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
 
+import Collider from "../engine/components/Collider";
 import Engine from "../engine/core/Engine";
 import { Key } from "../engine/input/KeyEnum";
+import LineRenderer from "../engine/utils/LineRenderer";
 import Material from "../engine/components/Material";
 import MeshFromOBJ from "../engine/utils/MeshFromOBJ";
 import Object from "../engine/core/Object";
@@ -47,27 +49,54 @@ export default async function Init(setUiState?: Dispatch<SetStateAction<UIState>
 	canvas.onclick = () => engine.inputHandler.lockMouse();
 
 	const obj = new Object();
-	const mesh = await MeshFromOBJ("/models/sphere.obj");
+	const mesh = await MeshFromOBJ("/models/cube.obj");
 	obj.addComponent(mesh);
-	// const texture = await TextureFromImg("/images/cat.png");
-	// obj.addComponent(texture);
-	// const vertCode = await readFile("/shaders/vertex/shader.vert");
-	// const fragCode = await readFile("/shaders/fragment/shader.frag");
-
+	const collider = new Collider();
+	obj.addComponent(collider);
 	const material = new Material(new Vector3(1.0, 0.0, 0.0));
 	obj.addComponent(material);
 	const vertCode = await readFile("/shaders/vertex/shader.vert");
 	const fragCode = await readFile("/shaders/fragment/material.frag");
 	const shader = new Shader(vertCode, fragCode);
 	obj.addComponent(shader);
-
 	scene.add(obj);
 	const transform = obj.getComponent<Transform>(Transform);
 
+	const lineRenderer = new LineRenderer([]);
+
 	transform.position.setZ(-10);
+	transform.rotation.setAll(45);
 
 	function update() {
 		engine.update();
+
+		transform.rotation.setZ(360 * Math.random());
+		transform.rotation.setX(360 * Math.random());
+		transform.rotation.setY(360 * Math.random());
+
+		lineRenderer.vertices = [
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.minY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.minY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.minY, collider.boundingBox.maxZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.minY, collider.boundingBox.maxZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.minY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.maxY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.maxY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.maxY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.maxY, collider.boundingBox.maxZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.maxY, collider.boundingBox.maxZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.maxY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.maxY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.minY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.maxY, collider.boundingBox.minZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.maxY, collider.boundingBox.maxZ),
+			new Vector3(collider.boundingBox.maxX, collider.boundingBox.minY, collider.boundingBox.maxZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.minY, collider.boundingBox.maxZ),
+			new Vector3(collider.boundingBox.minX, collider.boundingBox.maxY, collider.boundingBox.maxZ),
+		];
+
+		lineRenderer.render();
+
 		const camera = engine.scene.camera;
 		const cameraTransform = camera.getComponent<Transform>(Transform);
 

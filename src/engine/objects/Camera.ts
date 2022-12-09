@@ -22,7 +22,7 @@ export default class Camera extends Object {
 		this.init();
 	}
 
-	init() {
+	private init() {
 		mat4.perspective(this.projectionMatrix, 45 * (Math.PI / 180), gl.canvas.width / gl.canvas.height, this.zNear, this.zFar);
 	}
 

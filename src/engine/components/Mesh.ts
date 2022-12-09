@@ -20,11 +20,6 @@ export default class Mesh extends Component {
 		this.indices = indices;
 		this.normals = normals;
 		this.textures = textures;
-
-		this.initMatrices();
-	}
-
-	initMatrices() {
 		this.modelMatrix = mat4.create();
 		this.normalMatrix = mat4.create();
 	}
