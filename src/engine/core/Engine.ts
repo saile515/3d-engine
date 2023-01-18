@@ -27,7 +27,9 @@ export default class Engine {
 		// Stores the last 60 frames in array and calculate average difference
 		this.perfBuffer.push(perf);
 		if (this.perfBuffer.length > 60) this.perfBuffer.shift();
-		this.fps = Math.floor(1000 / ((this.perfBuffer[this.perfBuffer.length - 1] - this.perfBuffer[0]) / 60));
+		this.fps = Math.floor(
+			1000 / ((this.perfBuffer[this.perfBuffer.length - 1] - this.perfBuffer[0]) / 60)
+		);
 	}
 
 	clean() {

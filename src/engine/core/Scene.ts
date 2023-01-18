@@ -1,4 +1,5 @@
 import Camera from "../objects/Camera";
+import { CollisionHandler } from "./CollisionHandler";
 import Mesh from "../components/Mesh";
 import Object from "./Object";
 import Shader from "../components/Shader";
@@ -8,10 +9,12 @@ import readFile from "../utils/readFile";
 export default class Scene {
 	children: Object[];
 	camera: Camera;
+	collisionHandler: CollisionHandler;
 
 	constructor() {
 		this.children = [];
 		this.camera = new Camera();
+		this.collisionHandler = new CollisionHandler();
 		this.add(this.camera);
 		this.init();
 	}
@@ -22,15 +25,13 @@ export default class Scene {
 
 		// Add skybox to scene
 		const skybox = new Skybox();
-		const vertCode = await readFile("/shaders/vertex/shader.vert");
-		const fragCode = await readFile("/shaders/fragment/skyboxShader.frag");
-		const shader = new Shader(vertCode, fragCode);
-		skybox.addComponent(shader);
 		this.add(skybox);
 	}
 
 	update() {
 		this.children.forEach((object) => object.update());
+
+		this.collisionHandler.update(this.children);
 
 		this.render();
 	}

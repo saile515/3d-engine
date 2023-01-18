@@ -3,7 +3,7 @@ import Mesh from "./Mesh";
 import Transform from "./Transform";
 import { vec3 } from "gl-matrix";
 
-interface BoundingBox {
+export interface BoundingBox {
 	minX: number;
 	minY: number;
 	minZ: number;
@@ -38,13 +38,24 @@ export default class Collider extends Component {
 		// Init variables
 		const vertices = this.mesh.vertices;
 
-		const boundingBox: BoundingBox = { minX: Infinity, minY: Infinity, minZ: Infinity, maxX: -Infinity, maxY: -Infinity, maxZ: -Infinity };
+		const boundingBox: BoundingBox = {
+			minX: Infinity,
+			minY: Infinity,
+			minZ: Infinity,
+			maxX: -Infinity,
+			maxY: -Infinity,
+			maxZ: -Infinity,
+		};
 
 		const coordinates: { x: number[]; y: number[]; z: number[] } = { x: [], y: [], z: [] };
 
 		// Find transformed coordinate of vertices
 		for (let i = 0; i < vertices.length; i += 3) {
-			const transformedVertex = vec3.fromValues(vertices[i], vertices[i + 1], vertices[i + 2]);
+			const transformedVertex = vec3.fromValues(
+				vertices[i],
+				vertices[i + 1],
+				vertices[i + 2]
+			);
 			vec3.transformMat4(transformedVertex, transformedVertex, this.transform.matrix);
 
 			coordinates.x.push(transformedVertex[0]);

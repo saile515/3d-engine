@@ -45,12 +45,15 @@ export default class InputHandler {
 			// Set mouse position
 			this.mousePosition = new Vector2(event.clientX, event.clientY);
 			// Accumulate delta movement throughout frame
-			this.mouseDelta.set((this.mouseDelta.x += event.movementX), this.mouseDelta.y + event.movementY);
+			this.mouseDelta.set(
+				(this.mouseDelta.x += event.movementX),
+				this.mouseDelta.y + event.movementY
+			);
 		});
 	}
 
 	lockMouse() {
 		// Lock mouse
-		gl.canvas.requestPointerLock();
+		(gl.canvas as HTMLCanvasElement).requestPointerLock();
 	}
 }
